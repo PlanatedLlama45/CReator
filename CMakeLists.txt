@@ -62,4 +62,4 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
 
-set_target_properties(Cosmic-Reach-Data-Mod-Maker PROPERTIES OUTPUT_NAME "Raylib Test")
+set_target_properties(Cosmic-Reach-Data-Mod-Maker PROPERTIES OUTPUT_NAME "CReator")
