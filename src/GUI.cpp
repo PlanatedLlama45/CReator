@@ -60,6 +60,7 @@ TextEdit::TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool 
     textPos.x = bgPos.x + outline;
     textPos.y = bgPos.y + (bgSize.y - fontSize) * 0.5f;
     recalculateTextPos();
+    cursorPos = initText.length();
 }
 
 TextEdit::~TextEdit() { }
@@ -78,17 +79,38 @@ void TextEdit::draw() {
     std::string drawText = text;
 
     if (isFocused()) {
+        if (isKeyPressedRepeat(KEY_LEFT) && cursorPos != 0)
+            cursorPos--;
+        else if (isKeyPressedRepeat(KEY_RIGHT) && cursorPos != text.length())
+            cursorPos++;
+        else if (IsKeyPressed(KEY_HOME))
+            cursorPos = 0;
+        else if (IsKeyPressed(KEY_END))
+            cursorPos = text.length();
+
         char key = GetCharPressed();
 
-        if (key) {
-            text += key;
-            recalculateTextPos();
-        } else if (text.size() > 0 && (IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE))) {
-            text.erase(--text.end());
-            recalculateTextPos();
+        if (key != ';') {
+            if (key) {
+                text.insert(cursorPos, 1, key);
+                recalculateTextPos();
+                cursorPos++;
+            } else if (!text.empty()) {
+                if (isKeyPressedRepeat(KEY_BACKSPACE) && cursorPos != 0) {
+                    text.erase(cursorPos - 1, 1);
+                    recalculateTextPos();
+                    cursorPos--;
+                } else if (isKeyPressedRepeat(KEY_DELETE) && cursorPos != text.length()) {
+                    text.erase(cursorPos, 1);
+                    recalculateTextPos();
+                }
+            }
         }
 
-        drawText = text + '|';
+        if (cursorPos == text.length())
+            drawText += '|';
+        else
+            drawText.insert(cursorPos, 1, '|');
     }
 
     DrawText(drawText.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
@@ -106,14 +128,18 @@ bool TextEdit::isFocused() {
 
 void TextEdit::setText(const std::string& str) {
     text = str;
+    cursorPos = text.length();
     while (recalculateTextPos());
 }
 
 bool TextEdit::recalculateTextPos() {
     int width = MeasureText(text.c_str(), fontSize);
 
-    if (width >= bgSize.x)
-        text.erase(--text.end());
+    if (width >= bgSize.x) {
+        text.erase(text.length() - 1);
+        cursorPos--;
+    }
+
     
     if (!centerText)
         return false;

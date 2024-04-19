@@ -75,6 +75,8 @@ struct TextEditColorScheme {
 };
 
 
+#define isKeyPressedRepeat(key) ( IsKeyPressed(key) || IsKeyPressedRepeat(key) )
+
 class TextEdit : public Button {
 public:
     TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "");
@@ -91,6 +93,7 @@ protected:
     Color fontColor;
     int fontSize;
     std::string text;
+    size_t cursorPos;
     Vector2 textPos;
     bool centerText;
 

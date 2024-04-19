@@ -7,6 +7,11 @@
 #define isScene(id) ( currentScene->getId() == id )
 #define isButtonPressed(id) ( currentScene->getUiElement<Button>(id).isPressed() )
 
+#define modTextButtonArgs(mod) mod->getId(), { 395, 35 }, { 390, 50 }, true, addEllipsis(mod->getName(), 388, 32), 32, true, colorScheme_textEdit, 2
+#define modTextButtonArgs_noId(mod) { 395, 35 }, { 390, 50 }, true, addEllipsis(mod->getName(), 388, 32), 32, true, colorScheme_textEdit, 2
+#define blockTextButtonArgs(block) block->id, { 300, 290 }, { 590, 50 }, true, addEllipsis(block->name, 590, 32), 32, true, colorScheme_textEdit, 2
+#define blockTextButtonArgs_noId(block) { 300, 290 }, { 590, 50 }, true, addEllipsis(block->name, 590, 32), 32, true, colorScheme_textEdit, 2
+
 extern Scene *currentScene;
 extern Map<std::string, Scene *> scenes;
 extern Mod *currentMod;

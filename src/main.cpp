@@ -5,7 +5,7 @@ Map<std::string, Scene *> scenes = { };
 Mod *currentMod = nullptr;
 Block *currentBlock = nullptr;
 std::vector<Mod *> mods = { };
-std::string cosmicReachDir = getenv("LOCALAPPDATA");
+std::string cosmicReachDir = std::string(getenv("LOCALAPPDATA")) + "\\cosmic-reach\\";
 // std::string openFolderCommand = "explorer " +  + "\\cosmic-reach";
 
 ButtonColorScheme colorScheme_button {
@@ -34,8 +34,6 @@ TextCheckboxColorScheme colorScheme_textCheckbox {
 };
 
 int main(int argc, const char **argv) {
-    // getFromFileDialog();
-    // return 0;
     InitWindow(600, 480, "CRreator");
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
@@ -79,20 +77,20 @@ int main(int argc, const char **argv) {
             .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
 
             .addTextCheckbox("slabs-checkbox", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
-            // Faces
-            .addStaticText("faces-label", { 300, 230 }, true, "Block Faces", 30, BLACK)
-            // All faces
-            .addStaticText("face-all-label", { 300, 240 }, true, "All", 24, BLACK)
-            .addTextEdit("face-all-edit", { 300, 280 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
-            // Top face
-            .addStaticText("face-top-label", { 300, 95 }, true, "Top", 24, BLACK)
-            .addTextEdit("face-top-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
-            // Down face
-            .addStaticText("face-down-label", { 300, 95 }, true, "Down", 24, BLACK)
-            .addTextEdit("face-down-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
-            // Side face
-            .addStaticText("face-side-label", { 300, 95 }, true, "Side", 24, BLACK)
-            .addTextEdit("face-side-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            // // Faces
+            // .addStaticText("faces-label", { 300, 230 }, true, "Block Faces", 30, BLACK)
+            // // All faces
+            // .addStaticText("face-all-label", { 300, 240 }, true, "All", 24, BLACK)
+            // .addTextEdit("face-all-edit", { 300, 280 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            // // Top face
+            // .addStaticText("face-top-label", { 300, 95 }, true, "Top", 24, BLACK)
+            // .addTextEdit("face-top-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            // // Down face
+            // .addStaticText("face-down-label", { 300, 95 }, true, "Down", 24, BLACK)
+            // .addTextEdit("face-down-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            // // Side face
+            // .addStaticText("face-side-label", { 300, 95 }, true, "Side", 24, BLACK)
+            // .addTextEdit("face-side-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
 
             .addTextButton("delete", { 150, 455 }, { 290, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
             .addTextButton("back", { 450, 455 }, { 290, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
@@ -148,8 +146,14 @@ int main(int argc, const char **argv) {
         // Mod edit screen
         else if (isScene("mod-edit")) {
             if (isButtonPressed("back")) {
+                std::string oldId = currentMod->getId();
                 currentMod->setId(currentScene->getUiElement<TextEdit>("id-edit").getText());
                 currentMod->setName(currentScene->getUiElement<TextEdit>("name-edit").getText());
+
+                auto modPair = modSelectorScrollBoxElements.find(oldId);
+                delete modPair->second;
+                *modPair = { currentMod->getId(), new TextButton(modTextButtonArgs_noId(currentMod)) };
+
                 dumpMods();
                 setScene("mod-selector");
             } else if (isButtonPressed("delete")) {
@@ -185,9 +189,15 @@ int main(int argc, const char **argv) {
         // Block edit screen
         else if (isScene("block-edit")) {
             if (isButtonPressed("back")) {
+                std::string oldId = currentBlock->id;
                 currentBlock->id = currentScene->getUiElement<TextEdit>("id-edit").getText();
                 currentBlock->name = currentScene->getUiElement<TextEdit>("name-edit").getText();
                 currentBlock->slabs = currentScene->getUiElement<TextCheckbox>("slabs-checkbox").isChecked();
+
+                auto blockPair = blockSelectorScrollBoxElements.find(oldId);
+                delete blockPair->second;
+                *blockPair = { currentBlock->id, new TextButton(blockTextButtonArgs_noId(currentBlock)) };
+
                 dumpMods();
                 setScene("mod-edit");
             } else if (isButtonPressed("delete")) {
@@ -271,23 +281,25 @@ void loadMods() {
     std::string id, name;
 
     std::vector<Block *> blocks;
-    std::string blockId, blockName, slabStr;
+    std::string blockId, blockName, blockSlabs;
     std::string fullFace;
     std::string faceName, facePath;
+
+    size_t safety = 0;
 
     while (!file.eof()) {
         std::getline(file, id, ';');
         std::getline(file, name, ';');
         if (id.empty() || name.empty())
             break;
-        while (true) {
+        while (safety < 100) {
             std::getline(file, blockId, ';');
             if (blockId == "==")
                 break;
             std::getline(file, blockName, ';');
-            std::getline(file, slabStr, ';');
+            std::getline(file, blockSlabs, ';');
 
-            blocks.push_back(new Block{ blockId, blockName, { }, (slabStr == "true") });
+            blocks.push_back(new Block{ blockId, blockName, { }, (blockSlabs == "true") });
 
             for (size_t i = 0; i < 4; i++) {
                 std::getline(file, fullFace, ';');
@@ -307,6 +319,7 @@ void loadMods() {
                 else if (faceName == "side")
                     blocks.back()->faces.insert(TextureFace::side, facePath);
             }
+            safety++;
         }
 
         mods.push_back(new Mod(id, name));
@@ -323,10 +336,7 @@ void loadMods() {
 
     for (Mod *mod : mods) {
         mainMenuScrollBox.addTextButton(
-            mod->getId(),
-            { 395, 35 }, { 390, 50 }, true,
-            addEllipsis(mod->getName(), 388, 32), 32, true,
-            colorScheme_textEdit, 2
+            modTextButtonArgs(mod)
         );
     }
 }
@@ -346,7 +356,7 @@ void dumpMods() {
 
         file << mod->getId() << ';' << mod->getName() << ';';
         for (Block *b : blocks) {
-            file << b->id << ';' << b->name << ';' << (b->slabs ? "true" : "false") << ';';
+            file << b->id << ';' << b->name << ';' << (b->slabs ? "true;" : "false;");
             for (auto [face, path] : b->faces)
                 file << getTextureFaceStr(face) << ':' << path << ';';
             file << "=;";
@@ -371,10 +381,7 @@ void createMod(strRef id, strRef name) {
         currentMod = mods.back();
 
         getScene("mod-selector").getUiElement<ScrollBox>("mod-list").addTextButton(
-            currentMod->getId(),
-            { 395, 35 }, { 390, 50 }, true,
-            addEllipsis(currentMod->getName(), 388, 32), 32, true,
-            colorScheme_textEdit, 2
+            modTextButtonArgs(currentMod)
         );
     }
 }
@@ -392,9 +399,7 @@ void createBlock(Block *b) {
         currentMod->getBlocks().push_back(b);
 
         getScene("mod-edit").getUiElement<ScrollBox>("block-list").addTextButton(
-            b->id, { 300, 290 }, { 590, 50 },
-            true, addEllipsis(b->name, 590, 32),
-            32, true, colorScheme_textEdit, 2
+            blockTextButtonArgs(b)
         );
     }
 }
@@ -416,9 +421,7 @@ void setMod(strRef id) {
     blockList.clearElements();
     for (Block *b : currentMod->getBlocks()) {
         blockList.addTextButton(
-            b->id, { 300, 290 }, { 590, 50 },
-            true, addEllipsis(b->name, 590, 32),
-            32, true, colorScheme_textEdit, 2
+            blockTextButtonArgs(b)
         );
     }
 }
@@ -451,46 +454,79 @@ std::string addEllipsis(std::string text, float width, int fontSize) {
     return textEllipsis;
 }
 
-// std::string getFromFileDialog() {
-//     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-//     if (SUCCEEDED(hr)) {
-//         IFileOpenDialog *pFileOpen;
+/*
+std::string getFromFileDialog() {
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    if (SUCCEEDED(hr)) {
+        IFileOpenDialog *pFileOpen;
 
-//         // Create the FileOpenDialog object.
-//         hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
-//                 IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+        // Create the FileOpenDialog object.
+        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
+                IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
 
-//         if (SUCCEEDED(hr))
-//         {
-//             // Show the Open dialog box.
-//             hr = pFileOpen->Show(NULL);
+        if (SUCCEEDED(hr))
+        {
+            // Show the Open dialog box.
+            hr = pFileOpen->Show(NULL);
 
-//             // Get the file name from the dialog box.
-//             if (SUCCEEDED(hr))
-//             {
-//                 IShellItem *pItem;
-//                 hr = pFileOpen->GetResult(&pItem);
-//                 if (SUCCEEDED(hr))
-//                 {
-//                     PWSTR pszFilePath;
-//                     hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+            // Get the file name from the dialog box.
+            if (SUCCEEDED(hr))
+            {
+                IShellItem *pItem;
+                hr = pFileOpen->GetResult(&pItem);
+                if (SUCCEEDED(hr))
+                {
+                    PWSTR pszFilePath;
+                    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
-//                     // Display the file name to the user.
-//                     if (SUCCEEDED(hr))
-//                     {
-//                         MessageBoxW(NULL, pszFilePath, L"File Path", MB_OK);
-//                         CoTaskMemFree(pszFilePath);
-//                     }
-//                     pItem->Release();
-//                 }
-//             }
-//             pFileOpen->Release();
-//         }
-//         CoUninitialize();
-//     }
-//     return "";
-// }
+                    // Display the file name to the user.
+                    if (SUCCEEDED(hr))
+                    {
+                        MessageBoxW(NULL, pszFilePath, L"File Path", MB_OK);
+                        CoTaskMemFree(pszFilePath);
+                    }
+                    pItem->Release();
+                }
+            }
+            pFileOpen->Release();
+        }
+        CoUninitialize();
+    }
+    return "";
+}
+*/
 
 void exportCurrentMod() {
+    fs::create_directories(cosmicReachDir + "mods\\");
+    fs::create_directories(cosmicReachDir + "export_mods\\");
 
+    std::string modsPath = cosmicReachDir + "mods\\" + currentMod->getId() + '\\';
+    std::string exportModsPath = cosmicReachDir + "export_mods\\" + currentMod->getId() + '\\';
+
+    fs::create_directories(exportModsPath);
+    // export_mods/blocks/<modId>
+    fs::create_directories(exportModsPath + "blocks\\" + currentMod->getId());
+    // export_mods/models/blocks/<modId>
+    fs::create_directories(exportModsPath + "models\\blocks\\" + currentMod->getId());
+    // export_mods/textures/blocks/<modId>
+    fs::create_directories(exportModsPath + "textures\\blocks\\" + currentMod->getId());
+
+    std::ofstream file;
+    
+    for (Block *b : currentMod->getBlocks()) {
+        // export_mods/blocks/<modId>/<blockId>.json
+        file.open(exportModsPath + "blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
+        file << b->toString(currentMod);
+        file.close();
+
+        // export_mods/models/blocks/<modId>/<blockId>.json
+        file.open(exportModsPath + "models\\blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
+        file << b->modelToString(currentMod);
+        file.close();
+
+        // export_mods/models/blocks/<modId>/<blockId>.json
+        file.open(exportModsPath + "models\\blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
+        file << b->modelToString(currentMod);
+        file.close();
+    }
 }

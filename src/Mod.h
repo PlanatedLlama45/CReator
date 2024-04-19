@@ -6,6 +6,7 @@
 enum class TextureFace { all, top, down, side };
 
 extern std::string getTextureFaceStr(const TextureFace &face);
+extern std::string getFilenameFromPath(strRef path);
 
 class Mod;
 
@@ -15,7 +16,8 @@ struct Block {
     Map<TextureFace, std::string> faces;
     bool slabs;
 
-    std::string toString(const Mod &mod) const;
+    std::string toString(Mod *mod) const;
+    std::string modelToString(Mod *mod);
 };
 
 class Mod {
