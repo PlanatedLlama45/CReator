@@ -28,6 +28,8 @@ Button::Button(Vector2 pos, Vector2 size, bool centered, ButtonColorScheme color
 Button::~Button() { }
 
 void Button::draw() {
+    if (hidden) return;
+
     ColorScheme currentColor;
     if (isHeld())
         currentColor = colorScheme.pressed;
@@ -40,25 +42,26 @@ void Button::draw() {
 }
 
 bool Button::isHeld() const {
-    return isHovered() && IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+    return !hidden && isHovered() && IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 }
 
 bool Button::isPressed() const {
-    return isHovered() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+    return !hidden && isHovered() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 }
 
 /*
  * Text Edit
 */
 
-TextEdit::TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText) :
+TextEdit::TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText, bool limitText) :
         Button(pos, size, centered, { colorScheme.normal, colorScheme.hovered, colorScheme.focused }, outline) {
     this->fontSize = fontSize;
     this->fontColor = colorScheme.fontColor;
     this->centerText = centerText;
+    this->limitText = limitText;
     this->text = initText;
     textPos.x = bgPos.x + outline;
-    textPos.y = bgPos.y + (bgSize.y - fontSize) * 0.5f;
+    textPos.y = bgPos.y + bgSize.y * 0.5f - fontSize * (strCount(text, '\n') + 1) * 0.5f;
     recalculateTextPos();
     cursorPos = initText.length();
 }
@@ -66,6 +69,8 @@ TextEdit::TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool 
 TextEdit::~TextEdit() { }
 
 void TextEdit::draw() {
+    if (hidden) return;
+    
     ColorScheme currentColor;
     if (isFocused())
         currentColor = colorScheme.pressed;
@@ -87,10 +92,16 @@ void TextEdit::draw() {
             cursorPos = 0;
         else if (IsKeyPressed(KEY_END))
             cursorPos = text.length();
+        else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_V)) {
+            size_t oldSize = text.length();
+            text += GetClipboardText();
+            cursorPos += text.length() - oldSize;
+            recalculateTextPos();
+        }
 
         char key = GetCharPressed();
 
-        if (key != ';') {
+        if (key != '|') {
             if (key) {
                 text.insert(cursorPos, 1, key);
                 recalculateTextPos();
@@ -114,9 +125,14 @@ void TextEdit::draw() {
     }
 
     DrawText(drawText.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
+
+    if (isHovered())
+        SetMouseCursor(MOUSE_CURSOR_IBEAM);
 }
 
 bool TextEdit::isFocused() {
+    if (hidden) return false;
+
     if (isPressed()) {
         focused = true;
         return true;
@@ -135,19 +151,20 @@ void TextEdit::setText(const std::string& str) {
 bool TextEdit::recalculateTextPos() {
     int width = MeasureText(text.c_str(), fontSize);
 
-    if (width >= bgSize.x) {
+    if (limitText && width >= bgSize.x) {
         text.erase(text.length() - 1);
         cursorPos--;
     }
-
     
     if (!centerText)
         return false;
 
-    if (width < bgSize.x) {
+    if (!limitText || width < bgSize.x) {
         textPos.x = bgPos.x + (bgSize.x - width) * 0.5f;
         return false;
     }
+
+    textPos.y = bgPos.y + bgSize.y * 0.5f - fontSize * (strCount(text, '\n') + 1) * 0.5f;
     
     return true;
 }
@@ -162,6 +179,8 @@ TextButton::TextButton(Vector2 pos, Vector2 size, bool centered, strRef text, in
 TextButton::~TextButton() { }
 
 void TextButton::draw() {
+    if (hidden) return;
+    
     Button::draw();
 
     DrawText(text.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
@@ -193,6 +212,8 @@ ScrollBox::~ScrollBox() {
 }
 
 void ScrollBox::draw() {
+    if (hidden) return;
+    
     if (isHovered()) {
         scrollOffset += GetMouseWheelMove() * scrollSpeed;
 
@@ -266,10 +287,10 @@ ScrollBox &ScrollBox::addButton(strRef id, Vector2 pos, Vector2 size, bool cente
     return *this;
 }
 
-ScrollBox &ScrollBox::addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText) {
+ScrollBox &ScrollBox::addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText, bool limitText) {
     elements.insert(
         id,
-        new TextEdit(pos, size, centered, fontSize, centerText, colorScheme, outline, initText)
+        new TextEdit(pos, size, centered, fontSize, centerText, colorScheme, outline, initText, limitText)
     );
     doBootleg();
     return *this;
@@ -302,6 +323,15 @@ ScrollBox &ScrollBox::addTextCheckbox(strRef id, Vector2 pos, Vector2 size, bool
     return *this;
 }
 
+ScrollBox &ScrollBox::addImageBox(strRef id, Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline) {
+    elements.insert(
+        id,
+        new ImageBox(pos, size, centered, imagePath, outlineColor, outline)
+    );
+    doBootleg();
+    return *this;
+}
+
 /*
  * StaticText
 */
@@ -320,6 +350,8 @@ StaticText::StaticText(Vector2 pos, bool centered, strRef text, int fontSize, Co
 StaticText::~StaticText() {}
 
 void StaticText::draw() {
+    if (hidden) return;
+    
     DrawText(text.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
 }
 
@@ -335,6 +367,7 @@ void StaticText::recalculateTextPos() {
     int width = MeasureText(text.c_str(), fontSize);
 
     textPos.x = pos.x - width * 0.5f;
+    textPos.y = pos.y - fontSize * (strCount(text, '\n') + 1) * 0.5f;
 }
 
 /*
@@ -363,6 +396,8 @@ TextCheckbox::TextCheckbox(Vector2 pos, Vector2 size, bool centered, strRef text
 TextCheckbox::~TextCheckbox() { }
 
 void TextCheckbox::draw() {
+    if (hidden) return;
+    
     ColorScheme currentColor;
     if (isHovered())
         currentColor = colorScheme.hovered;
@@ -379,7 +414,44 @@ void TextCheckbox::draw() {
 }
 
 bool TextCheckbox::isChecked() {
+    if (hidden) return false;
+    
     if (isPressed())
         checked = !checked;
     return checked;
+}
+
+/*
+ * ImageBox
+*/
+
+ImageBox::ImageBox(Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline) {
+    this->size = size;
+    setPos(pos, centered);
+    this->outlineColor = outlineColor;
+
+    image = LoadTexture(imagePath.c_str());
+
+    imgPos = Vector2AddValue(this->pos, outline);
+    imgSize = Vector2SubtractValue(size, outline * 2.f);
+}
+
+ImageBox::~ImageBox() { }
+
+void ImageBox::draw() {
+    if (hidden) return;
+    
+    DrawRectangleV(pos, size, outlineColor);
+    DrawTexturePro(
+        image,
+        Rectangle{ 0, 0, (float)image.width, (float)image.height },
+        Rectangle{ imgPos.x, imgPos.y, imgSize.x, imgSize.y },
+        Vector2Zero(), 0,
+        WHITE
+    );
+}
+
+void ImageBox::setImage(strRef imagePath) {
+    UnloadTexture(image);
+    image = LoadTexture(imagePath.c_str());
 }

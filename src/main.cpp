@@ -46,16 +46,16 @@ int main(int argc, const char **argv) {
             .addTextButton("exit", { 95, 450 }, { 180, 50 }, true, "Exit", 30, true, colorScheme_textEdit_red, 2);
 
         addScene("mod-creator")
-            .addTextEdit("mod-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod ID")
-            .addTextEdit("mod-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod name")
+            .addTextEdit("mod-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod ID", false)
+            .addTextEdit("mod-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod name", false)
             .addTextButton("done", { 300, 265 }, { 180, 40 }, true, "Done", 30, true, colorScheme_textEdit, 2)
             .addTextButton("back", { 300, 315 }, { 180, 40 }, true, "Back", 30, true, colorScheme_textEdit,  2);
         
         addScene("mod-edit")
             .addStaticText("id-label", { 300, 20 }, true, "Mod ID", 24, BLACK)
-            .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
             .addStaticText("name-label", { 300, 95 }, true, "Mod Name", 24, BLACK)
-            .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
             .addScrollBox("block-list", { 0, 255, }, { 600, 270 }, false, 15, 5, "No blocks yet", 30, colorScheme_scrollBox, 2)
             .addTextButton("save", { 75, 230 }, { 140, 40 }, true, "Save", 30, true, colorScheme_textEdit, 2)
             .addTextButton("export", { 225, 230 }, { 140, 40 }, true, "Export", 30, true, colorScheme_textEdit, 2)
@@ -71,29 +71,39 @@ int main(int argc, const char **argv) {
         addScene("block-edit")
             // Id edit
             .addStaticText("id-label", { 300, 20 }, true, "Block ID", 24, BLACK)
-            .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
             // Name edit
             .addStaticText("name-label", { 300, 95 }, true, "Block Name", 24, BLACK)
-            .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
 
             .addTextCheckbox("slabs-checkbox", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
-            // // Faces
-            // .addStaticText("faces-label", { 300, 230 }, true, "Block Faces", 30, BLACK)
-            // // All faces
-            // .addStaticText("face-all-label", { 300, 240 }, true, "All", 24, BLACK)
-            // .addTextEdit("face-all-edit", { 300, 280 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
-            // // Top face
-            // .addStaticText("face-top-label", { 300, 95 }, true, "Top", 24, BLACK)
-            // .addTextEdit("face-top-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
-            // // Down face
-            // .addStaticText("face-down-label", { 300, 95 }, true, "Down", 24, BLACK)
-            // .addTextEdit("face-down-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            // Faces
+            .addStaticText("faces-label", { 300, 240 }, true, "Block Faces", 30, BLACK)
+            // All faces
+            .addStaticText("face-all-label", { 150, 280 }, true, "All", 24, BLACK)
+            .addImageBox("face-all-image", { 55, 320 }, { 50, 50 }, true, "", BLACK, 2)
+            .addTextButton("face-all-paste", { 180, 320 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
+            .addTextButton("face-all-delete", { 180, 320 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
+            // Top face
+            .addStaticText("face-top-label", { 450, 280 }, true, "Top", 24, BLACK)
+            .addImageBox("face-top-image", { 355, 320 }, { 50, 50 }, true, "", BLACK, 2)
+            .addTextButton("face-top-paste", { 480, 320 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
+            .addTextButton("face-top-delete", { 480, 320 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
             // // Side face
-            // .addStaticText("face-side-label", { 300, 95 }, true, "Side", 24, BLACK)
-            // .addTextEdit("face-side-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "")
+            // .addStaticText("face-side-label", { 150, 360 }, true, "Side", 24, BLACK)
+            // .addTextEdit("face-side-edit", { 150, 400 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
+            // // Down face
+            // .addStaticText("face-down-label", { 450, 360 }, true, "Down", 24, BLACK)
+            // .addTextEdit("face-down-edit", { 450, 400 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
 
             .addTextButton("delete", { 150, 455 }, { 290, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
             .addTextButton("back", { 450, 455 }, { 290, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
+        
+        Scene &blockEditScene = getScene("block-edit");
+        blockEditScene.getUiElement("face-all-delete").setHidden(true);
+        blockEditScene.getUiElement("face-top-delete").setHidden(true);
+        // blockEditScene.getUiElement("face-side-paste").setHidden(true);
+        // blockEditScene.getUiElement("face-down-paste").setHidden(true);
         
         addScene("block-delete-confirm")
             .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this block?", 24, BLACK)
@@ -101,8 +111,8 @@ int main(int argc, const char **argv) {
             .addTextButton("nuh-uh", { 395, 260 }, { 180, 50}, true, "No", 30, true, colorScheme_textEdit, 2);
 
         addScene("block-creator")
-            .addTextEdit("block-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block ID")
-            .addTextEdit("block-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block name")
+            .addTextEdit("block-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block ID", false)
+            .addTextEdit("block-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block name", false)
             .addTextButton("done", { 300, 265 }, { 180, 40 }, true, "Done", 30, true, colorScheme_textEdit, 2)
             .addTextButton("back", { 300, 315 }, { 180, 40 }, true, "Back", 30, true, colorScheme_textEdit,  2);
     }
@@ -167,6 +177,11 @@ int main(int argc, const char **argv) {
                     if (((Button *)elem)->isPressed()) {
                         setBlock(id);
                         setScene("block-edit");
+                        for (auto [face, path] : currentBlock->faces) {
+                            currentScene->getUiElement<ImageBox>("face-" + getTextureFaceStr(face) + "-image").setImage(path);
+                            currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-paste").setHidden(true);
+                            currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-delete").setHidden(false);
+                        }
                     }
                 }
             }
@@ -200,9 +215,15 @@ int main(int argc, const char **argv) {
 
                 dumpMods();
                 setScene("mod-edit");
+                for (auto [face, path] : currentBlock->faces) {
+                    currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-paste").setHidden(false);
+                    currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-delete").setHidden(true);
+                }
             } else if (isButtonPressed("delete")) {
                 setScene("block-delete-confirm");
             }
+            faceImageLogic("all", TextureFace::all)
+            faceImageLogic("top", TextureFace::top)
         }
         // Block deletion confirmation screen
         else if (isScene("block-delete-confirm")) {
@@ -219,7 +240,7 @@ int main(int argc, const char **argv) {
                 }
                 setScene("mod-edit");
             } else if (isButtonPressed("nuh-uh")) {
-                setScene("mod-edit");
+                setScene("block-edit");
             }
         }
         // Block creator screen
@@ -239,6 +260,7 @@ int main(int argc, const char **argv) {
             }
         }
         
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
         BeginDrawing();
             ClearBackground(RAYWHITE);
             currentScene->draw();
@@ -288,21 +310,21 @@ void loadMods() {
     size_t safety = 0;
 
     while (!file.eof()) {
-        std::getline(file, id, ';');
-        std::getline(file, name, ';');
+        std::getline(file, id, '|');
+        std::getline(file, name, '|');
         if (id.empty() || name.empty())
             break;
         while (safety < 100) {
-            std::getline(file, blockId, ';');
+            std::getline(file, blockId, '|');
             if (blockId == "==")
                 break;
-            std::getline(file, blockName, ';');
-            std::getline(file, blockSlabs, ';');
+            std::getline(file, blockName, '|');
+            std::getline(file, blockSlabs, '|');
 
             blocks.push_back(new Block{ blockId, blockName, { }, (blockSlabs == "true") });
 
             for (size_t i = 0; i < 4; i++) {
-                std::getline(file, fullFace, ';');
+                std::getline(file, fullFace, '|');
                 if (fullFace == "=")
                     break;
                 
@@ -342,9 +364,7 @@ void loadMods() {
 }
 
 bool checkTexture(strRef filename) {
-    int width, height, channels;
-    stbi_info(filename.c_str(), &width, &height, &channels);
-    return (width == 16 && height == 16);
+    return IsFileExtension(filename.c_str(), ".png");;
 }
 
 void dumpMods() {
@@ -354,14 +374,14 @@ void dumpMods() {
     for (Mod *mod : mods) {
         blocks = mod->getBlocks();
 
-        file << mod->getId() << ';' << mod->getName() << ';';
+        file << mod->getId() << '|' << mod->getName() << '|';
         for (Block *b : blocks) {
-            file << b->id << ';' << b->name << ';' << (b->slabs ? "true;" : "false;");
+            file << b->id << '|' << b->name << '|' << (b->slabs ? "true" : "false") << '|';
             for (auto [face, path] : b->faces)
-                file << getTextureFaceStr(face) << ':' << path << ';';
-            file << "=;";
+                file << getTextureFaceStr(face) << ':' << path << '|';
+            file << "=|";
         }
-        file << "==;";
+        file << "==|";
     }
 
     file.close();

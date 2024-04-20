@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
-project(Cosmic-Reach-Data-Mod-Maker VERSION 1.0.0)
+project(CReate VERSION 1.0.0)
 
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -33,11 +33,11 @@ file(
     src/*.cpp
 )
 
-add_executable(Cosmic-Reach-Data-Mod-Maker ${SOURCES})
+add_executable(CReate ${SOURCES})
 #set(raylib_VERBOSE 1)
 
 target_include_directories(
-    Cosmic-Reach-Data-Mod-Maker
+    CReate
     PRIVATE dependencies
     ${CMAKE_SOURCE_DIR}/../.public-include/
 )
@@ -62,4 +62,4 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
 
-set_target_properties(Cosmic-Reach-Data-Mod-Maker PROPERTIES OUTPUT_NAME "CReator")
+set_target_properties(CReate PROPERTIES OUTPUT_NAME "CReator")

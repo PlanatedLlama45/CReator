@@ -10,7 +10,7 @@
 namespace fs = std::filesystem;
 #include <fstream>
 
-#include <stb_image.h>
+// #include <stb_image.h>
 
 #define getter(variable, type, capitalized) inline type get##capitalized() const { return variable; }
 #define getter_ref(variable, type, capitalized) inline const type &get##capitalized() const { return variable; }
@@ -28,4 +28,14 @@ inline bool strContains(std::basic_string<T> str, T value) {
             return true;
     }
     return false;
+}
+
+template <class T>
+inline size_t strCount(std::basic_string<T> str, T value) {
+    size_t amount = 0;
+    for (T elem : str) {
+        if (elem == value)
+            amount++;
+    }
+    return amount;
 }

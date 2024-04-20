@@ -23,11 +23,15 @@ public:
     setter(size, Vector2, Size)
     setter(offset, Vector2, Offset)
 
+    getter(hidden, bool, Hidden)
+    setter(hidden, bool, Hidden)
+
 protected:
     Vector2 pos;
     Vector2 size;
     Vector2 offset;
     Vector2 offPos;
+    bool hidden = false;
 };
 
 
@@ -79,7 +83,7 @@ struct TextEditColorScheme {
 
 class TextEdit : public Button {
 public:
-    TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "");
+    TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "", bool limitText = true);
     ~TextEdit();
 
     void draw() override;
@@ -96,6 +100,7 @@ protected:
     size_t cursorPos;
     Vector2 textPos;
     bool centerText;
+    bool limitText;
 
     bool focused;
 
@@ -158,6 +163,22 @@ protected:
 };
 
 
+class ImageBox : public UiElement {
+public:
+    ImageBox(Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline = 2);
+    ~ImageBox();
+
+    void draw() override;
+    void setImage(strRef imagePath);
+
+protected:
+    Texture2D image;
+    Vector2 imgPos;
+    Vector2 imgSize;
+    Color outlineColor;
+};
+
+
 class ScrollBox : public UiElement {
 public:
     ScrollBox(Vector2 pos, Vector2 size, bool centered, float scrollSpeed, int spacing, strRef placeholder, int placeholderSize, ColorScheme colorScheme, int outline = 2);
@@ -166,10 +187,11 @@ public:
     void draw() override;
 
     ScrollBox &addButton(strRef id, Vector2 pos, Vector2 size, bool centered, ButtonColorScheme colorScheme, int outline = 2);
-    ScrollBox &addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "");
+    ScrollBox &addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "", bool limitText = true);
     ScrollBox &addTextButton(strRef id, Vector2 pos, Vector2 size, bool centered, strRef text, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2);
     ScrollBox &addStaticText(strRef id, Vector2 pos, bool centered, strRef text, int fontSize, Color fontColor);
     ScrollBox &addTextCheckbox(strRef id, Vector2 pos, Vector2 size, bool centered, strRef text, int fontSize, float textOffset, TextCheckboxColorScheme colorScheme, int outline = 2);
+    ScrollBox &addImageBox(strRef id, Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline = 2);
 
     template <class T = UiElement>
     inline T &getUiElement(strRef id) {

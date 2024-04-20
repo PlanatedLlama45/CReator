@@ -23,10 +23,10 @@ Scene &Scene::addButton(strRef id, Vector2 pos, Vector2 size, bool centered, But
     return *this;
 }
 
-Scene &Scene::addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText) {
+Scene &Scene::addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText, bool limitText) {
     elements.insert(
         id,
-        new TextEdit(pos, size, centered, fontSize, centerText, colorScheme, outline, initText)
+        new TextEdit(pos, size, centered, fontSize, centerText, colorScheme, outline, initText, limitText)
     );
     return *this;
 }
@@ -59,6 +59,14 @@ Scene &Scene::addTextCheckbox(strRef id, Vector2 pos, Vector2 size, bool centere
     elements.insert(
         id,
         new TextCheckbox(pos, size, centered, text, fontSize, textOffset, colorScheme, outline)
+    );
+    return *this;
+}
+
+Scene &Scene::addImageBox(strRef id, Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline) {
+    elements.insert(
+        id,
+        new ImageBox(pos, size, centered, imagePath, outlineColor, outline)
     );
     return *this;
 }
