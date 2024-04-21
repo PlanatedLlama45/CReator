@@ -6,6 +6,7 @@ Mod *currentMod = nullptr;
 Block *currentBlock = nullptr;
 std::vector<Mod *> mods = { };
 std::string cosmicReachDir = std::string(getenv("LOCALAPPDATA")) + "\\cosmic-reach\\";
+TextureFace currentFace = TextureFace::all;
 // std::string openFolderCommand = "explorer " +  + "\\cosmic-reach";
 
 ButtonColorScheme colorScheme_button {
@@ -134,29 +135,34 @@ int main(int argc, const char **argv) {
                 setScene("mod-edit");
             } else if (isButtonPressed("delete")) {
                 setScene("block-delete-confirm");
-            } else if (isButtonPressed("faces-btn")) {
-                setScene("face-edit");
-                for (auto [face, path] : currentBlock->faces) {
-                    currentScene->getUiElement<ImageBox>("face-" + getTextureFaceStr(face) + "-image").setImage(path);
-                    currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-paste").setHidden(true);
-                    currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-delete").setHidden(false);
-                }
             }
+            blockEditFaceChooseLogic("all", TextureFace::all, "All")
+            blockEditFaceChooseLogic("top", TextureFace::top, "Top")
+            blockEditFaceChooseLogic("side", TextureFace::side, "Side")
+            blockEditFaceChooseLogic("down", TextureFace::down, "Down")
         }
         // Faces edit screen
         else if (isScene("face-edit")) {
             if (isButtonPressed("back")) {
-                for (auto [face, path] : currentBlock->faces) {
-                    currentScene->getUiElement<ImageBox>("face-" + getTextureFaceStr(face) + "-image").setImage("");
-                    currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-paste").setHidden(false);
-                    currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-delete").setHidden(true);
-                }
+                currentScene->getUiElement<ImageBox>("face-image").setImage("");
+                currentScene->getUiElement("face-paste").setHidden(false);
+                currentScene->getUiElement("face-delete").setHidden(true);
                 setScene("block-edit");
+            } else if (isButtonPressed("face-paste")) {
+                const char *clipboard = GetClipboardText();
+                std::string texturePath = (clipboard ? clipboard : "");
+                if (isValidTexture(texturePath)) {
+                    currentScene->getUiElement<ImageBox>("face-image").setImage(texturePath);
+                    currentBlock->faces.insert(currentFace, texturePath);
+                    currentScene->getUiElement("face-paste").setHidden(true);
+                    currentScene->getUiElement("face-delete").setHidden(false);
+                }
+            } else if (isButtonPressed("face-delete")) {
+                currentScene->getUiElement<ImageBox>("face-image").setImage("");
+                currentBlock->faces.erase(currentFace);
+                currentScene->getUiElement("face-paste").setHidden(false);
+                currentScene->getUiElement("face-delete").setHidden(true);
             }
-            faceImageLogic("all", TextureFace::all)
-            faceImageLogic("top", TextureFace::top)
-            faceImageLogic("side", TextureFace::side)
-            faceImageLogic("down", TextureFace::down)
         }
         // Block deletion confirmation screen
         else if (isScene("block-delete-confirm")) {
@@ -273,40 +279,25 @@ void createUI() {
         .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
 
         .addTextCheckbox("slabs-checkbox", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
-        .addTextButton("faces-btn", { 300, 240 }, { 300, 40 }, true, "Edit Faces", 30, true, colorScheme_textEdit, 2)
+        
+        .addStaticText("face-label", { 300, 240 }, true, "Face Textures", 30, BLACK)
+        .addTextButton("face-all", { 150, 300 }, { 280, 40 }, true, "All", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("face-top", { 450, 300 }, { 280, 40 }, true, "Top", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("face-side", { 150, 360 }, { 280, 40 }, true, "Side", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("face-down", { 450, 360 }, { 280, 40 }, true, "Down", 30, true, colorScheme_textEdit, 2)
 
         .addTextButton("delete", { 150, 455 }, { 290, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
         .addTextButton("back", { 450, 455 }, { 290, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
     
     addScene("face-edit")
-        // All faces
-        .addStaticText("face-all-label", { 300, 30 }, true, "All", 24, BLACK)
-        .addImageBox("face-all-image", { 205, 70 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
-        .addTextButton("face-all-paste", { 330, 70 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
-        .addTextButton("face-all-delete", { 330, 70 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
-        // Top face
-        .addStaticText("face-top-label", { 300, 130 }, true, "Top", 24, BLACK)
-        .addImageBox("face-top-image", { 205, 170 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
-        .addTextButton("face-top-paste", { 330, 170 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
-        .addTextButton("face-top-delete", { 330, 170 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
-        // Side face
-        .addStaticText("face-side-label", { 300, 230 }, true, "Side", 24, BLACK)
-        .addImageBox("face-side-image", { 205, 270 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
-        .addTextButton("face-side-paste", { 330, 270 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
-        .addTextButton("face-side-delete", { 330, 270 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
-        // Down face
-        .addStaticText("face-down-label", { 300, 330 }, true, "Down", 24, BLACK)
-        .addImageBox("face-down-image", { 205, 370 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
-        .addTextButton("face-down-paste", { 330, 370 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
-        .addTextButton("face-down-delete", { 330, 370 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
+        .addStaticText("face-label", { 300, 50 }, true, "All", 30, BLACK)
+        .addImageBox("face-image", { 300, 160 }, { 160, 160 }, true, "", LIGHTGRAY, 2)
+        .addTextButton("face-paste", { 300, 290 }, { 280, 50 }, true, "Paste an image path", 24, true, colorScheme_textEdit, 2)
+        .addTextButton("face-delete", { 300, 290 }, { 280, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
 
         .addTextButton("back", { 300, 455 }, { 300, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
     
-    Scene &faceEditScene = getScene("face-edit");
-    faceEditScene.getUiElement("face-all-delete").setHidden(true);
-    faceEditScene.getUiElement("face-top-delete").setHidden(true);
-    faceEditScene.getUiElement("face-side-delete").setHidden(true);
-    faceEditScene.getUiElement("face-down-delete").setHidden(true);
+    getScene("face-edit").getUiElement("face-delete").setHidden(true);
 
     addScene("block-creator")
         .addTextEdit("block-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block ID", false)

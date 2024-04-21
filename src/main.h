@@ -12,21 +12,16 @@
 #define blockTextButtonArgs(block) block->id, { 300, 290 }, { 590, 50 }, true, addEllipsis(block->name, 590, 32), 32, true, colorScheme_textEdit, 2
 #define blockTextButtonArgs_noId(block) { 300, 290 }, { 590, 50 }, true, addEllipsis(block->name, 590, 32), 32, true, colorScheme_textEdit, 2
 
-#define faceImageLogic(faceId, enumFace) \
-    else if (isButtonPressed("face-" faceId "-paste")) { \
-        const char *clipboard = GetClipboardText(); \
-        std::string texturePath = (clipboard ? clipboard : ""); \
-        if (isValidTexture(texturePath)) { \
-            currentScene->getUiElement<ImageBox>("face-" faceId "-image").setImage(texturePath); \
-            currentBlock->faces.insert(enumFace, texturePath); \
-            currentScene->getUiElement("face-" faceId "-paste").setHidden(true); \
-            currentScene->getUiElement("face-" faceId "-delete").setHidden(false); \
+#define blockEditFaceChooseLogic(faceStr, faceEnum, faceDisplay) \
+    else if (isButtonPressed("face-" faceStr)) { \
+        currentFace = faceEnum; \
+        setScene("face-edit"); \
+        currentScene->getUiElement<StaticText>("face-label").setText(faceDisplay); \
+        if (currentBlock->faces.contains(faceEnum)) { \
+            currentScene->getUiElement<ImageBox>("face-image").setImage(currentBlock->faces[faceEnum]); \
+            currentScene->getUiElement("face-paste").setHidden(true); \
+            currentScene->getUiElement("face-delete").setHidden(false); \
         } \
-    } else if (isButtonPressed("face-" faceId "-delete")) { \
-        currentScene->getUiElement<ImageBox>("face-" faceId "-image").setImage(""); \
-        currentBlock->faces.erase(enumFace); \
-        currentScene->getUiElement("face-" faceId "-paste").setHidden(false); \
-        currentScene->getUiElement("face-" faceId "-delete").setHidden(true); \
     }
 
 extern Scene *currentScene;
@@ -35,6 +30,7 @@ extern Mod *currentMod;
 extern Block *currentBlock;
 extern std::vector<Mod *> mods;
 extern std::string cosmicReachDir;
+extern TextureFace currentFace;
 // extern std::string openFolderCommand;
 
 extern ButtonColorScheme colorScheme_button;
