@@ -1,7 +1,7 @@
 #pragma once
 
-#include <raylib/raylib.h>
-#include <raylib/raymath.h>
+#include <raylib.h>
+#include <raymath.h>
 
 #include <iostream>
 #include <vector>
@@ -40,4 +40,4 @@ inline size_t strCount(std::basic_string<T> str, T value) {
     return amount;
 }
 
-#define DEBUG
+// #define DEBUG

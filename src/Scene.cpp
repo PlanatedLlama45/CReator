@@ -10,13 +10,18 @@ Scene::~Scene() { }
 void Scene::draw() {
     for (auto [id, elem] : elements) {
 #ifdef DEBUG
-        std::cout << "\t";
+        std::cout << "\t" << id << " : ";
 #endif // DEBUG
         elem->draw();
 #ifdef DEBUG
     std::cout << "\n";
 #endif // DEBUG
     }
+}
+
+void Scene::update() {
+    for (auto [id, elem] : elements)
+        elem->update();
 }
 
 Scene &Scene::addButton(strRef id, Vector2 pos, Vector2 size, bool centered, ButtonColorScheme colorScheme, int outline) {

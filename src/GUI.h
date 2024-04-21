@@ -8,6 +8,7 @@ public:
     inline UiElement() { hidden = false; }
 
     inline virtual void draw() = 0;
+    inline virtual void update() = 0;
 
     bool isHovered() const;
     
@@ -21,6 +22,8 @@ public:
             pos = Vector2Subtract(val, Vector2Scale(size, 0.5f));
         else
             pos = val;
+        
+        offPos = Vector2Add(pos, offset);
     }
     setter(size, Vector2, Size)
     setter(offset, Vector2, Offset)
@@ -55,6 +58,7 @@ public:
     ~Button();
 
     void draw() override;
+    void update() override;
 
     bool isHeld() const;
     bool isPressed() const;
@@ -70,6 +74,7 @@ protected:
     Vector2 bgSize;
 
     ButtonColorScheme colorScheme;
+    ColorScheme currentColorScheme;
 };
 
 
@@ -89,6 +94,7 @@ public:
     ~TextEdit();
 
     void draw() override;
+    void update() override;
 
     bool isFocused();
 
@@ -98,7 +104,7 @@ public:
 protected:
     Color fontColor;
     int fontSize;
-    std::string text;
+    std::string text, drawText;
     size_t cursorPos;
     Vector2 textPos;
     bool centerText;
@@ -116,6 +122,7 @@ public:
     ~TextButton();
 
     void draw() override;
+    void update() override;
 };
 
 
@@ -125,6 +132,7 @@ public:
     ~StaticText();
 
     void draw() override;
+    void update() override;
 
     void setText(strRef val);
 
@@ -152,6 +160,8 @@ public:
     ~TextCheckbox();
 
     void draw() override;
+    void update() override;
+
     bool isChecked();
 
     setter(checked, bool, Checked)
@@ -171,6 +181,8 @@ public:
     ~ImageBox();
 
     void draw() override;
+    void update() override;
+
     void setImage(strRef imagePath);
 
 protected:
@@ -187,6 +199,7 @@ public:
     ~ScrollBox();
 
     void draw() override;
+    void update() override;
 
     ScrollBox &addButton(strRef id, Vector2 pos, Vector2 size, bool centered, ButtonColorScheme colorScheme, int outline = 2);
     ScrollBox &addTextEdit(strRef id, Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "", bool limitText = true);

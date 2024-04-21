@@ -10,6 +10,7 @@ public:
     ~Scene();
 
     void draw();
+    void update();
 
     getter(id, strRef, Id)
 

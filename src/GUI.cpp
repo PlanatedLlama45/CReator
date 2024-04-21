@@ -30,18 +30,22 @@ Button::~Button() { }
 void Button::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "Button";
+    std::cout << "Button ";
 #endif // DEBUG
 
-    ColorScheme currentColor;
+    DrawRectangleV(Vector2Add(pos, offset), size, currentColorScheme.outline);
+    DrawRectangleV(Vector2Add(bgPos, offset), bgSize, currentColorScheme.backround);
+}
+
+void Button::update() {
+    if (hidden) return;
+
     if (isHeld())
-        currentColor = colorScheme.pressed;
+        currentColorScheme = colorScheme.pressed;
     else if (isHovered())
-        currentColor = colorScheme.hovered;
+        currentColorScheme = colorScheme.hovered;
     else
-        currentColor = colorScheme.normal;
-    DrawRectangleV(Vector2Add(pos, offset), size, currentColor.outline);
-    DrawRectangleV(Vector2Add(bgPos, offset), bgSize, currentColor.backround);
+        currentColorScheme = colorScheme.normal;
 }
 
 bool Button::isHeld() const {
@@ -74,20 +78,26 @@ TextEdit::~TextEdit() { }
 void TextEdit::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "TextEdit";
+    std::cout << "TextEdit ";
 #endif // DEBUG
     
-    ColorScheme currentColor;
-    if (isFocused())
-        currentColor = colorScheme.pressed;
-    else if (isHovered())
-        currentColor = colorScheme.hovered;
-    else
-        currentColor = colorScheme.normal;
-    DrawRectangleV(Vector2Add(pos, offset), size, currentColor.outline);
-    DrawRectangleV(Vector2Add(bgPos, offset), bgSize, currentColor.backround);
+    DrawRectangleV(Vector2Add(pos, offset), size, currentColorScheme.outline);
+    DrawRectangleV(Vector2Add(bgPos, offset), bgSize, currentColorScheme.backround);
 
-    std::string drawText = text;
+    DrawText(drawText.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
+}
+
+void TextEdit::update() {
+    if (hidden) return;
+
+    if (isFocused())
+        currentColorScheme = colorScheme.pressed;
+    else if (isHovered())
+        currentColorScheme = colorScheme.hovered;
+    else
+        currentColorScheme = colorScheme.normal;
+
+    drawText = text;
 
     if (isFocused()) {
         if (isKeyPressedRepeat(KEY_LEFT) && cursorPos != 0)
@@ -129,8 +139,6 @@ void TextEdit::draw() {
         else
             drawText.insert(cursorPos, 1, '|');
     }
-
-    DrawText(drawText.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
 
     if (isHovered())
         SetMouseCursor(MOUSE_CURSOR_IBEAM);
@@ -187,12 +195,15 @@ TextButton::~TextButton() { }
 void TextButton::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "Text";
+    std::cout << "Text ";
 #endif // DEBUG
     
     Button::draw();
-
     DrawText(text.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
+}
+
+void TextButton::update() {
+    Button::update();
 }
 
 /*
@@ -223,19 +234,13 @@ ScrollBox::~ScrollBox() {
 void ScrollBox::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "ScrollBox";
+    std::cout << "ScrollBox ";
 #endif // DEBUG
-    
-    if (isHovered()) {
-        scrollOffset += GetMouseWheelMove() * scrollSpeed;
-
-        if (scrollOffset > 0)
-            scrollOffset = 0;
-    }
     
     DrawRectangleV(Vector2Add(pos, offset), size, colorScheme.outline);
     DrawRectangleV(Vector2Add(bgPos, offset), bgSize, colorScheme.backround);
 
+    // Draw placeholder text
     if (elements.empty()) {
         Font defaultFont = GetFontDefault();
         int width = MeasureText(placeholder.c_str(), placeholderSize);
@@ -246,6 +251,8 @@ void ScrollBox::draw() {
         DrawText(placeholder.c_str(), textPos.x, textPos.y, placeholderSize, BLACK);
         return;
     }
+
+    // Draw elements
     float sizeOffset = 0;
     for (auto [_, elem] : elements) {
         elem->setOffset({ 0, scrollOffset + sizeOffset });
@@ -253,13 +260,27 @@ void ScrollBox::draw() {
         if (
             elem->getOffPos().y + elem->getSize().y > pos.y &&
             elem->getOffPos().y < pos.y + size.y
-        )
-            elem->draw();
+        ) elem->draw();
         sizeOffset += elem->getSize().y + spacing;
     }
     
+    // Draw bootleg
     DrawRectangleV(bootlegPos, bootlegSize, RAYWHITE);
     DrawRectangleV(pos, { size.x, outline }, colorScheme.outline);
+}
+
+void ScrollBox::update() {
+    if (hidden) return;
+
+    for (auto [id, elem] : elements)
+        elem->update();
+
+    if (isHovered()) {
+        scrollOffset += GetMouseWheelMove() * scrollSpeed;
+
+        if (scrollOffset > 0)
+            scrollOffset = 0;
+    }
 }
 
 void ScrollBox::removeElement(strRef id) {
@@ -364,11 +385,13 @@ StaticText::~StaticText() {}
 void StaticText::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "StaticText";
+    std::cout << "StaticText ";
 #endif // DEBUG
     
     DrawText(text.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
 }
+
+void StaticText::update() { }
 
 void StaticText::setText(strRef val) {
     text = val;
@@ -413,17 +436,11 @@ TextCheckbox::~TextCheckbox() { }
 void TextCheckbox::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "TextCheckbox";
+    std::cout << "TextCheckbox ";
 #endif // DEBUG
     
-    ColorScheme currentColor;
-    if (isHovered())
-        currentColor = colorScheme.hovered;
-    else
-        currentColor = colorScheme.normal;
-    
-    DrawRectangleV(Vector2Add(pos, offset), size, currentColor.outline);
-    DrawRectangleV(Vector2Add(bgPos, offset), bgSize, currentColor.backround);
+    DrawRectangleV(Vector2Add(pos, offset), size, currentColorScheme.outline);
+    DrawRectangleV(Vector2Add(bgPos, offset), bgSize, currentColorScheme.backround);
 
     DrawText(text.c_str(), pos.x + offset.x + textPos.x + size.x * 0.5f, pos.y + offset.y + textPos.y, fontSize, fontColor);
 
@@ -431,11 +448,19 @@ void TextCheckbox::draw() {
         DrawRectangleV(Vector2Add(dotPos, offset), dotSize, dotColor);
 }
 
-bool TextCheckbox::isChecked() {
-    if (hidden) return false;
+void TextCheckbox::update() {
+    if (hidden) return;
+
+    if (isHovered())
+        currentColorScheme = colorScheme.hovered;
+    else
+        currentColorScheme = colorScheme.normal;
     
     if (isPressed())
         checked = !checked;
+}
+
+bool TextCheckbox::isChecked() {
     return checked;
 }
 
@@ -459,18 +484,20 @@ ImageBox::~ImageBox() { }
 void ImageBox::draw() {
     if (hidden) return;
 #ifdef DEBUG
-    std::cout << "ImageBox";
+    std::cout << "ImageBox ";
 #endif // DEBUG
     
-    DrawRectangleV(pos, size, outlineColor);
+    DrawRectangleV(Vector2Add(pos, offset), size, outlineColor);
     DrawTexturePro(
         image,
         Rectangle{ 0, 0, (float)image.width, (float)image.height },
-        Rectangle{ imgPos.x, imgPos.y, imgSize.x, imgSize.y },
+        Rectangle{ imgPos.x + offset.x, imgPos.y + offset.y, imgSize.x, imgSize.y },
         Vector2Zero(), 0,
         WHITE
     );
 }
+
+void ImageBox::update() { }
 
 void ImageBox::setImage(strRef imagePath) {
     UnloadTexture(image);

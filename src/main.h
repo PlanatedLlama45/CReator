@@ -14,7 +14,8 @@
 
 #define faceImageLogic(faceId, enumFace) \
     else if (isButtonPressed("face-" faceId "-paste")) { \
-        std::string texturePath = GetClipboardText(); \
+        const char *clipboard = GetClipboardText(); \
+        std::string texturePath = (clipboard ? clipboard : ""); \
         if (isValidTexture(texturePath)) { \
             currentScene->getUiElement<ImageBox>("face-" faceId "-image").setImage(texturePath); \
             currentBlock->faces.insert(enumFace, texturePath); \

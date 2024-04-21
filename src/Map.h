@@ -88,10 +88,10 @@ public:
     inline Iterator end() {
         return begin() + size();
     }
-    inline Val front() {
+    inline Val &front() {
         return begin()->second;
     }
-    inline Val back() {
+    inline Val &back() {
         return (--end())->second;
     }
     inline Iterator find(const Key &key) {
