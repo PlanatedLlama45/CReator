@@ -34,8 +34,6 @@ public:
         inline friend bool operator ==(const Iterator &it1, const Iterator &it2) { return (it1.m_ptr == it2.m_ptr); }
         inline friend bool operator !=(const Iterator &it1, const Iterator &it2) { return (it1.m_ptr != it2.m_ptr); }
 
-        inline pointer _m_get_ptr() { return m_ptr; }
-
     private:
         pointer m_ptr;
     };
@@ -139,6 +137,6 @@ private:
     using vec_iterator = typename std::vector<Entry>::iterator;
 
     inline vec_iterator toVecIterator(Iterator iter) {
-        return vec_iterator(iter._m_get_ptr());
+        return vec_iterator(entries.data() + (iter - begin()));
     }
 };

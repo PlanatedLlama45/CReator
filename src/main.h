@@ -15,7 +15,7 @@
 #define faceImageLogic(faceId, enumFace) \
     else if (isButtonPressed("face-" faceId "-paste")) { \
         std::string texturePath = GetClipboardText(); \
-        if (IsFileExtension(texturePath.c_str(), ".png")) { \
+        if (isValidTexture(texturePath)) { \
             currentScene->getUiElement<ImageBox>("face-" faceId "-image").setImage(texturePath); \
             currentBlock->faces.insert(enumFace, texturePath); \
             currentScene->getUiElement("face-" faceId "-paste").setHidden(true); \
@@ -43,6 +43,8 @@ extern TextCheckboxColorScheme colorScheme_textCheckbox;
 
 extern int main(int argc, const char **argv);
 
+extern void createUI();
+
 extern Scene &addScene(strRef name);
 extern Scene &getScene(strRef name);
 extern Scene *setScene(strRef name);
@@ -61,7 +63,6 @@ extern void setMod(strRef id);
 extern void setBlock(strRef id);
 
 extern std::string addEllipsis(std::string text, float width, int fontSize);
-
-extern std::string getFromFileDialog();
+extern bool isValidTexture(std::string filename);
 
 extern void exportCurrentMod();

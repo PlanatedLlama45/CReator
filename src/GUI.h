@@ -5,6 +5,8 @@
 
 class UiElement {
 public:
+    inline UiElement() { hidden = false; }
+
     inline virtual void draw() = 0;
 
     bool isHovered() const;

@@ -39,3 +39,5 @@ inline size_t strCount(std::basic_string<T> str, T value) {
     }
     return amount;
 }
+
+#define DEBUG

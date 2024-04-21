@@ -5,14 +5,18 @@ Scene::Scene(strRef id) {
     elements = { };
 }
 
-Scene::~Scene() {
-    for (auto [_, elem] : elements)
-        delete elem;
-}
+Scene::~Scene() { }
 
 void Scene::draw() {
-    for (auto [_, elem] : elements)
+    for (auto [id, elem] : elements) {
+#ifdef DEBUG
+        std::cout << "\t";
+#endif // DEBUG
         elem->draw();
+#ifdef DEBUG
+    std::cout << "\n";
+#endif // DEBUG
+    }
 }
 
 Scene &Scene::addButton(strRef id, Vector2 pos, Vector2 size, bool centered, ButtonColorScheme colorScheme, int outline) {

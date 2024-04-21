@@ -15,7 +15,7 @@ bool UiElement::isHovered() const {
  * Button
 */
 
-Button::Button(Vector2 pos, Vector2 size, bool centered, ButtonColorScheme colorScheme, int outline) {
+Button::Button(Vector2 pos, Vector2 size, bool centered, ButtonColorScheme colorScheme, int outline) : UiElement() {
     this->size = size;
     setPos(pos, centered);
     
@@ -29,6 +29,9 @@ Button::~Button() { }
 
 void Button::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "Button";
+#endif // DEBUG
 
     ColorScheme currentColor;
     if (isHeld())
@@ -70,6 +73,9 @@ TextEdit::~TextEdit() { }
 
 void TextEdit::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "TextEdit";
+#endif // DEBUG
     
     ColorScheme currentColor;
     if (isFocused())
@@ -180,6 +186,9 @@ TextButton::~TextButton() { }
 
 void TextButton::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "Text";
+#endif // DEBUG
     
     Button::draw();
 
@@ -190,7 +199,7 @@ void TextButton::draw() {
  * ScrollBox
 */
 
-ScrollBox::ScrollBox(Vector2 pos, Vector2 size, bool centered, float scrollSpeed, int spacing, strRef placeholder, int placeholderSize, ColorScheme colorScheme, int outline) {
+ScrollBox::ScrollBox(Vector2 pos, Vector2 size, bool centered, float scrollSpeed, int spacing, strRef placeholder, int placeholderSize, ColorScheme colorScheme, int outline) : UiElement() {
     this->size = size;
     setPos(pos, centered);
 
@@ -213,6 +222,9 @@ ScrollBox::~ScrollBox() {
 
 void ScrollBox::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "ScrollBox";
+#endif // DEBUG
     
     if (isHovered()) {
         scrollOffset += GetMouseWheelMove() * scrollSpeed;
@@ -336,7 +348,7 @@ ScrollBox &ScrollBox::addImageBox(strRef id, Vector2 pos, Vector2 size, bool cen
  * StaticText
 */
 
-StaticText::StaticText(Vector2 pos, bool centered, strRef text, int fontSize, Color fontColor) {
+StaticText::StaticText(Vector2 pos, bool centered, strRef text, int fontSize, Color fontColor) : UiElement() {
     this->pos = pos;
     textPos.y = pos.y;
     if (centered)
@@ -351,6 +363,9 @@ StaticText::~StaticText() {}
 
 void StaticText::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "StaticText";
+#endif // DEBUG
     
     DrawText(text.c_str(), textPos.x + offset.x, textPos.y + offset.y, fontSize, fontColor);
 }
@@ -397,6 +412,9 @@ TextCheckbox::~TextCheckbox() { }
 
 void TextCheckbox::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "TextCheckbox";
+#endif // DEBUG
     
     ColorScheme currentColor;
     if (isHovered())
@@ -425,7 +443,7 @@ bool TextCheckbox::isChecked() {
  * ImageBox
 */
 
-ImageBox::ImageBox(Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline) {
+ImageBox::ImageBox(Vector2 pos, Vector2 size, bool centered, strRef imagePath, Color outlineColor, int outline) : UiElement() {
     this->size = size;
     setPos(pos, centered);
     this->outlineColor = outlineColor;
@@ -440,6 +458,9 @@ ImageBox::~ImageBox() { }
 
 void ImageBox::draw() {
     if (hidden) return;
+#ifdef DEBUG
+    std::cout << "ImageBox";
+#endif // DEBUG
     
     DrawRectangleV(pos, size, outlineColor);
     DrawTexturePro(

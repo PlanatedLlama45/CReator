@@ -26,6 +26,8 @@ public:
         return *(T *)elements[id];
     }
 
+    inline auto getElements() { return elements; }
+
 private:
     Map<std::string, UiElement *> elements;
     std::string id;

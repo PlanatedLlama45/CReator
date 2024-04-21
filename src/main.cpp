@@ -38,86 +38,7 @@ int main(int argc, const char **argv) {
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
 
-    // Ui monstrosity
-    {
-        addScene("mod-selector")
-            .addScrollBox("mod-list", { 395, 240, }, { 410, 480 }, true, 15, 5, "No mods yet", 30, colorScheme_scrollBox, 2)
-            .addTextButton("add-mod", { 95, 30 }, { 180, 50 }, true, "Add", 30, true, colorScheme_textEdit, 2)
-            .addTextButton("exit", { 95, 450 }, { 180, 50 }, true, "Exit", 30, true, colorScheme_textEdit_red, 2);
-
-        addScene("mod-creator")
-            .addTextEdit("mod-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod ID", false)
-            .addTextEdit("mod-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod name", false)
-            .addTextButton("done", { 300, 265 }, { 180, 40 }, true, "Done", 30, true, colorScheme_textEdit, 2)
-            .addTextButton("back", { 300, 315 }, { 180, 40 }, true, "Back", 30, true, colorScheme_textEdit,  2);
-        
-        addScene("mod-edit")
-            .addStaticText("id-label", { 300, 20 }, true, "Mod ID", 24, BLACK)
-            .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
-            .addStaticText("name-label", { 300, 95 }, true, "Mod Name", 24, BLACK)
-            .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
-            .addScrollBox("block-list", { 0, 255, }, { 600, 270 }, false, 15, 5, "No blocks yet", 30, colorScheme_scrollBox, 2)
-            .addTextButton("save", { 75, 230 }, { 140, 40 }, true, "Save", 30, true, colorScheme_textEdit, 2)
-            .addTextButton("export", { 225, 230 }, { 140, 40 }, true, "Export", 30, true, colorScheme_textEdit, 2)
-            .addTextButton("delete", { 375, 230 }, { 140, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
-            .addTextButton("back", { 525, 230 }, { 140, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2)
-            .addTextButton("add-block", { 300, 185 }, { 590, 40 }, true, "Add Block", 30, true, colorScheme_textEdit, 2);
-        
-        addScene("mod-delete-confirm")
-            .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this mod?", 24, BLACK)
-            .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
-            .addTextButton("nuh-uh", { 395, 260 }, { 180, 50}, true, "No", 30, true, colorScheme_textEdit, 2);
-        
-        addScene("block-edit")
-            // Id edit
-            .addStaticText("id-label", { 300, 20 }, true, "Block ID", 24, BLACK)
-            .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
-            // Name edit
-            .addStaticText("name-label", { 300, 95 }, true, "Block Name", 24, BLACK)
-            .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
-
-            .addTextCheckbox("slabs-checkbox", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
-            // Faces
-            .addStaticText("faces-label", { 300, 240 }, true, "Block Faces", 30, BLACK)
-            // All faces
-            .addStaticText("face-all-label", { 150, 280 }, true, "All", 24, BLACK)
-            .addImageBox("face-all-image", { 55, 320 }, { 50, 50 }, true, "", BLACK, 2)
-            .addTextButton("face-all-paste", { 180, 320 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
-            .addTextButton("face-all-delete", { 180, 320 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
-            // Top face
-            .addStaticText("face-top-label", { 450, 280 }, true, "Top", 24, BLACK)
-            .addImageBox("face-top-image", { 355, 320 }, { 50, 50 }, true, "", BLACK, 2)
-            .addTextButton("face-top-paste", { 480, 320 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
-            .addTextButton("face-top-delete", { 480, 320 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
-            // // Side face
-            // .addStaticText("face-side-label", { 150, 360 }, true, "Side", 24, BLACK)
-            // .addTextEdit("face-side-edit", { 150, 400 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
-            // // Down face
-            // .addStaticText("face-down-label", { 450, 360 }, true, "Down", 24, BLACK)
-            // .addTextEdit("face-down-edit", { 450, 400 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
-
-            .addTextButton("delete", { 150, 455 }, { 290, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
-            .addTextButton("back", { 450, 455 }, { 290, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
-        
-        Scene &blockEditScene = getScene("block-edit");
-        blockEditScene.getUiElement("face-all-delete").setHidden(true);
-        blockEditScene.getUiElement("face-top-delete").setHidden(true);
-        // blockEditScene.getUiElement("face-side-paste").setHidden(true);
-        // blockEditScene.getUiElement("face-down-paste").setHidden(true);
-        
-        addScene("block-delete-confirm")
-            .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this block?", 24, BLACK)
-            .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
-            .addTextButton("nuh-uh", { 395, 260 }, { 180, 50}, true, "No", 30, true, colorScheme_textEdit, 2);
-
-        addScene("block-creator")
-            .addTextEdit("block-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block ID", false)
-            .addTextEdit("block-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block name", false)
-            .addTextButton("done", { 300, 265 }, { 180, 40 }, true, "Done", 30, true, colorScheme_textEdit, 2)
-            .addTextButton("back", { 300, 315 }, { 180, 40 }, true, "Back", 30, true, colorScheme_textEdit,  2);
-    }
-    
-    setScene("mod-selector");
+    createUI();
     
     loadMods();
 
@@ -172,6 +93,7 @@ int main(int argc, const char **argv) {
                 setScene("block-creator");
             } else if (isButtonPressed("export")) {
                 exportCurrentMod();
+                setScene("export-done");
             } else {
                 for (auto [id, elem] : blockSelectorScrollBoxElements) {
                     if (((Button *)elem)->isPressed()) {
@@ -214,16 +136,19 @@ int main(int argc, const char **argv) {
                 *blockPair = { currentBlock->id, new TextButton(blockTextButtonArgs_noId(currentBlock)) };
 
                 dumpMods();
-                setScene("mod-edit");
                 for (auto [face, path] : currentBlock->faces) {
+                    currentScene->getUiElement<ImageBox>("face-" + getTextureFaceStr(face) + "-image").setImage("");
                     currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-paste").setHidden(false);
                     currentScene->getUiElement("face-" + getTextureFaceStr(face) + "-delete").setHidden(true);
                 }
+                setScene("mod-edit");
             } else if (isButtonPressed("delete")) {
                 setScene("block-delete-confirm");
             }
             faceImageLogic("all", TextureFace::all)
             faceImageLogic("top", TextureFace::top)
+            faceImageLogic("side", TextureFace::side)
+            faceImageLogic("down", TextureFace::down)
         }
         // Block deletion confirmation screen
         else if (isScene("block-delete-confirm")) {
@@ -259,12 +184,24 @@ int main(int argc, const char **argv) {
                 setScene("mod-edit");
             }
         }
-        
+        // Export doen screen
+        else if (isScene("export-done")) {
+            if (isButtonPressed("ok-btn")) {
+                setScene("mod-edit");
+            }
+        }
+
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+#ifdef DEBUG
+    std::cout << "Begin Drawing\n";
+#endif // DEBUG
         BeginDrawing();
             ClearBackground(RAYWHITE);
             currentScene->draw();
         EndDrawing();
+#ifdef DEBUG
+    std::cout << "End Drawing\n";
+#endif // DEBUG
     }
 
     CloseWindow();
@@ -279,6 +216,92 @@ int main(int argc, const char **argv) {
     return 0;
 }
 
+void createUI() {
+    addScene("mod-selector")
+        .addScrollBox("mod-list", { 395, 240, }, { 410, 480 }, true, 15, 5, "No mods yet", 30, colorScheme_scrollBox, 2)
+        .addTextButton("add-mod", { 95, 30 }, { 180, 50 }, true, "Add", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("exit", { 95, 450 }, { 180, 50 }, true, "Exit", 30, true, colorScheme_textEdit_red, 2);
+    setScene("mod-selector");
+
+    addScene("mod-creator")
+        .addTextEdit("mod-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod ID", false)
+        .addTextEdit("mod-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter mod name", false)
+        .addTextButton("done", { 300, 265 }, { 180, 40 }, true, "Done", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("back", { 300, 315 }, { 180, 40 }, true, "Back", 30, true, colorScheme_textEdit,  2);
+    
+    addScene("mod-edit")
+        .addStaticText("id-label", { 300, 20 }, true, "Mod ID", 24, BLACK)
+        .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
+        .addStaticText("name-label", { 300, 95 }, true, "Mod Name", 24, BLACK)
+        .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
+        .addScrollBox("block-list", { 0, 255, }, { 600, 270 }, false, 15, 5, "No blocks yet", 30, colorScheme_scrollBox, 2)
+        .addTextButton("save", { 75, 230 }, { 140, 40 }, true, "Save", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("export", { 225, 230 }, { 140, 40 }, true, "Export", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("delete", { 375, 230 }, { 140, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("back", { 525, 230 }, { 140, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("add-block", { 300, 185 }, { 590, 40 }, true, "Add Block", 30, true, colorScheme_textEdit, 2);
+    
+    addScene("mod-delete-confirm")
+        .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this mod?", 24, BLACK)
+        .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("nuh-uh", { 395, 260 }, { 180, 50}, true, "No", 30, true, colorScheme_textEdit, 2);
+
+    addScene("block-delete-confirm")
+        .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this block?", 24, BLACK)
+        .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("nuh-uh", { 395, 260 }, { 180, 50 }, true, "No", 30, true, colorScheme_textEdit, 2);
+    
+    addScene("block-edit")
+        // Id edit
+        .addStaticText("id-label", { 300, 20 }, true, "Block ID", 24, BLACK)
+        .addTextEdit("id-edit", { 300, 55 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
+        // Name edit
+        .addStaticText("name-label", { 300, 95 }, true, "Block Name", 24, BLACK)
+        .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
+
+        .addTextCheckbox("slabs-checkbox", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
+        // Faces
+        .addStaticText("faces-label", { 300, 240 }, true, "Block Faces", 30, BLACK)
+        // All faces
+        .addStaticText("face-all-label", { 150, 280 }, true, "All", 24, BLACK)
+        .addImageBox("face-all-image", { 55, 320 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
+        .addTextButton("face-all-paste", { 180, 320 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
+        .addTextButton("face-all-delete", { 180, 320 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
+        // Top face
+        .addStaticText("face-top-label", { 450, 280 }, true, "Top", 24, BLACK)
+        .addImageBox("face-top-image", { 355, 320 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
+        .addTextButton("face-top-paste", { 480, 320 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
+        .addTextButton("face-top-delete", { 480, 320 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
+        // Side face
+        .addStaticText("face-side-label", { 150, 360 }, true, "Side", 24, BLACK)
+        .addImageBox("face-side-image", { 55, 400 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
+        .addTextButton("face-side-paste", { 180, 400 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
+        .addTextButton("face-side-delete", { 180, 400 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
+        // Down face
+        .addStaticText("face-down-label", { 450, 360 }, true, "Down", 24, BLACK)
+        .addImageBox("face-down-image", { 355, 400 }, { 50, 50 }, true, "", LIGHTGRAY, 2)
+        .addTextButton("face-down-paste", { 480, 400 }, { 180, 50 }, true, "Paste an\nimage path ", 24, true, colorScheme_textEdit, 2)
+        .addTextButton("face-down-delete", { 480, 400 }, { 180, 50 }, true, "Clear image", 24, true, colorScheme_textEdit, 2)
+
+        .addTextButton("delete", { 150, 455 }, { 290, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("back", { 450, 455 }, { 290, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
+    
+    Scene &blockEditScene = getScene("block-edit");
+    blockEditScene.getUiElement("face-all-delete").setHidden(true);
+    blockEditScene.getUiElement("face-top-delete").setHidden(true);
+    blockEditScene.getUiElement("face-side-delete").setHidden(true);
+    blockEditScene.getUiElement("face-down-delete").setHidden(true);
+
+    addScene("block-creator")
+        .addTextEdit("block-id", { 300, 165 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block ID", false)
+        .addTextEdit("block-name", { 300, 215 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "Enter block name", false)
+        .addTextButton("done", { 300, 265 }, { 180, 40 }, true, "Done", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("back", { 300, 315 }, { 180, 40 }, true, "Back", 30, true, colorScheme_textEdit,  2);
+    
+    addScene("export-done")
+        .addStaticText("text", { 300, 200 }, true, "   The mod has been\n\nexported successfully", 30, BLACK)
+        .addTextButton("ok-btn", { 300, 260 }, { 180, 50 }, true, "Ok", 30, true, colorScheme_textEdit, 2); 
+}
 
 Scene &addScene(strRef name) {
     scenes.insert(name, new Scene(name));
@@ -474,47 +497,16 @@ std::string addEllipsis(std::string text, float width, int fontSize) {
     return textEllipsis;
 }
 
-/*
-std::string getFromFileDialog() {
-    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-    if (SUCCEEDED(hr)) {
-        IFileOpenDialog *pFileOpen;
-
-        // Create the FileOpenDialog object.
-        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
-                IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
-
-        if (SUCCEEDED(hr))
-        {
-            // Show the Open dialog box.
-            hr = pFileOpen->Show(NULL);
-
-            // Get the file name from the dialog box.
-            if (SUCCEEDED(hr))
-            {
-                IShellItem *pItem;
-                hr = pFileOpen->GetResult(&pItem);
-                if (SUCCEEDED(hr))
-                {
-                    PWSTR pszFilePath;
-                    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-                    // Display the file name to the user.
-                    if (SUCCEEDED(hr))
-                    {
-                        MessageBoxW(NULL, pszFilePath, L"File Path", MB_OK);
-                        CoTaskMemFree(pszFilePath);
-                    }
-                    pItem->Release();
-                }
-            }
-            pFileOpen->Release();
-        }
-        CoUninitialize();
+bool isValidTexture(std::string filename) {
+    if (fs::exists(filename) && IsFileExtension(filename.c_str(), ".png")) {
+        Image img = LoadImage(filename.c_str());
+        if (img.width != 16 || img.height != 16)
+            return false;
+        UnloadImage(img);
+        return true;
     }
-    return "";
+    return false;
 }
-*/
 
 void exportCurrentMod() {
     fs::create_directories(cosmicReachDir + "mods\\");
@@ -533,6 +525,7 @@ void exportCurrentMod() {
 
     std::ofstream file;
     
+    std::string texPath;
     for (Block *b : currentMod->getBlocks()) {
         // export_mods/blocks/<modId>/<blockId>.json
         file.open(exportModsPath + "blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
@@ -548,5 +541,13 @@ void exportCurrentMod() {
         file.open(exportModsPath + "models\\blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
         file << b->modelToString(currentMod);
         file.close();
+
+        for (auto [face, path] : b->faces) {
+            // export_mods/textures/<modId>/<texture>.png
+            texPath = exportModsPath + "textures\\blocks\\" + currentMod->getId() + '\\' + getFilenameFromPath(path);
+            if (!fs::exists(texPath))
+                fs::copy_file(path, texPath);
+        }
     }
+    // fs::copy(exportModsPath + "blocks", cosmicReachDir + "export_mods\\blocks", fs::copy_options::update_existing);
 }
