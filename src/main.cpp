@@ -211,6 +211,7 @@ int main(int argc, const char **argv) {
         currentScene->update();
 
 #ifdef DEBUG
+    system("clear");
     std::cout << "Begin Drawing\n";
 #endif // DEBUG
         BeginDrawing();
@@ -252,21 +253,10 @@ void createUI() {
         .addStaticText("name-label", { 300, 95 }, true, "Mod Name", 24, BLACK)
         .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
         .addScrollBox("block-list", { 0, 255, }, { 600, 270 }, false, 15, 5, "No blocks yet", 30, colorScheme_scrollBox, 2)
-        .addTextButton("save", { 75, 230 }, { 140, 40 }, true, "Save", 30, true, colorScheme_textEdit, 2)
-        .addTextButton("export", { 225, 230 }, { 140, 40 }, true, "Export", 30, true, colorScheme_textEdit, 2)
-        .addTextButton("delete", { 375, 230 }, { 140, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
-        .addTextButton("back", { 525, 230 }, { 140, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2)
-        .addTextButton("add-block", { 300, 185 }, { 590, 40 }, true, "Add Block", 30, true, colorScheme_textEdit, 2);
-    
-    addScene("mod-delete-confirm")
-        .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this mod?", 24, BLACK)
-        .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
-        .addTextButton("nuh-uh", { 395, 260 }, { 180, 50}, true, "No", 30, true, colorScheme_textEdit, 2);
-
-    addScene("block-delete-confirm")
-        .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this block?", 24, BLACK)
-        .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
-        .addTextButton("nuh-uh", { 395, 260 }, { 180, 50 }, true, "No", 30, true, colorScheme_textEdit, 2);
+        .addTextButton("add-block", { 300, 185 }, { 590, 40 }, true, "Add Block", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("export", { 100, 230 }, { 190, 40 }, true, "Export", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("delete", { 300, 230 }, { 190, 40 }, true, "Delete", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("back", { 500, 230 }, { 190, 40 }, true, "Back", 30, true, colorScheme_textEdit, 2);
     
     addScene("block-edit")
         // Id edit
@@ -307,6 +297,16 @@ void createUI() {
     addScene("export-done")
         .addStaticText("text", { 300, 200 }, true, "   The mod has been\n\nexported successfully", 30, BLACK)
         .addTextButton("ok-btn", { 300, 260 }, { 180, 50 }, true, "Ok", 30, true, colorScheme_textEdit, 2);
+    
+    addScene("mod-delete-confirm")
+        .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this mod?", 24, BLACK)
+        .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("nuh-uh", { 395, 260 }, { 180, 50}, true, "No", 30, true, colorScheme_textEdit, 2);
+
+    addScene("block-delete-confirm")
+        .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this block?", 24, BLACK)
+        .addTextButton("yes", { 205, 260 }, { 180, 50 }, true, "Yes", 30, true, colorScheme_textEdit_red, 2)
+        .addTextButton("nuh-uh", { 395, 260 }, { 180, 50 }, true, "No", 30, true, colorScheme_textEdit, 2);
 }
 
 Scene &addScene(strRef name) {

@@ -41,3 +41,4 @@ inline size_t strCount(std::basic_string<T> str, T value) {
 }
 
 // #define DEBUG
+

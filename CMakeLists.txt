@@ -34,7 +34,7 @@ file(
 )
 
 add_executable(CReate ${SOURCES})
-#set(raylib_VERBOSE 1)
+set(raylib_VERBOSE 1)
 
 target_include_directories(
     CReate
