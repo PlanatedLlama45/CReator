@@ -5,7 +5,10 @@ Scene::Scene(strRef id) {
     elements = { };
 }
 
-Scene::~Scene() { }
+Scene::~Scene() {
+    for (auto [id, elem] : elements)
+        delete elem;
+}
 
 void Scene::draw() {
     for (auto [id, elem] : elements) {

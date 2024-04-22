@@ -26,7 +26,7 @@ std::string Block::toString(Mod *mod) const {
         "  \"stringId\": \"" + mod->getId() + ':' + id + "\",\n"
         "  \"blockStates\": {\n"
         "    \"default\": {\n"
-        "      \"modelName\": \"" + mod->getId() + '/' + id + "\",\n"
+        "      \"modelName\": \"" + mod->getId() + '_' + id + "\",\n"
         "      \"blockEventsId\": \"base:block_events_default\",\n"
         "      \"isOpaque\": true,\n"
         "      \"generateSlabs\": " + (slabs ? "true" : "false") + "\n"
@@ -43,7 +43,7 @@ std::string Block::modelToString(Mod *mod) {
     for (auto [face, path] : faces) {
         result +=
             "    \"" + getTextureFaceStr(face) + "\": {\n"
-            "      \"filename\": \"" + mod->getId() + '/' + getFilenameFromPath(path) + "\"\n"
+            "      \"fileName\": \"" + mod->getId() + '/' + getFilenameFromPath(path) + "\"\n"
             "    },\n";
     }
     if (!faces.empty())
@@ -59,7 +59,10 @@ Mod::Mod(strRef id, strRef name) {
     this->name = name;
 }
 
-Mod::~Mod() { }
+Mod::~Mod() {
+    for (Block *b : blocks)
+        delete b;
+}
 
 void Mod::addBlock(Block *block) {
     blocks.push_back(block);

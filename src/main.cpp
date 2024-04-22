@@ -5,7 +5,7 @@ Map<std::string, Scene *> scenes = { };
 Mod *currentMod = nullptr;
 Block *currentBlock = nullptr;
 std::vector<Mod *> mods = { };
-std::string cosmicReachDir = std::string(getenv("LOCALAPPDATA")) + "\\cosmic-reach\\";
+fs::path cosmicReachDir = fs::path(getenv("LOCALAPPDATA")) / "cosmic-reach";
 TextureFace currentFace = TextureFace::all;
 // std::string openFolderCommand = "explorer " +  + "\\cosmic-reach";
 
@@ -114,6 +114,7 @@ int main(int argc, const char **argv) {
                         break;
                     }
                 }
+                delete currentMod;
                 setScene("mod-selector");
             } else if (isButtonPressed("nuh-uh")) {
                 setScene("mod-edit");
@@ -224,11 +225,8 @@ int main(int argc, const char **argv) {
     CloseWindow();
 
     dumpMods();
-    for (Mod *m : mods) {
-        for (Block *b : m->getBlocks())
-            delete b;
+    for (Mod *m : mods)
         delete m;
-    }
     for (auto [id, scene] : scenes)
         delete scene;
 
@@ -279,6 +277,7 @@ void createUI() {
         .addTextEdit("name-edit", { 300, 135 }, { 280, 40 }, true, 24, true, colorScheme_textEdit, 2, "", false)
 
         .addTextCheckbox("slabs-checkbox", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
+        .addTextCheckbox("pre", { 200, 190 }, { 30, 30 }, true, "Generate slabs?", 24, 25, colorScheme_textCheckbox)
         
         .addStaticText("face-label", { 300, 240 }, true, "Face Textures", 30, BLACK)
         .addTextButton("face-all", { 150, 300 }, { 280, 40 }, true, "All", 30, true, colorScheme_textEdit, 2)
@@ -516,45 +515,66 @@ bool isValidTexture(std::string filename) {
 }
 
 void exportCurrentMod() {
-    fs::create_directories(cosmicReachDir + "mods\\");
-    fs::create_directories(cosmicReachDir + "export_mods\\");
+    std::string modId = currentMod->getId();
+    fs::create_directories(cosmicReachDir / "mods");
+    fs::create_directories(cosmicReachDir / "export_mods");
 
-    std::string modsPath = cosmicReachDir + "mods\\" + currentMod->getId() + '\\';
-    std::string exportModsPath = cosmicReachDir + "export_mods\\" + currentMod->getId() + '\\';
+    fs::path modsPath = cosmicReachDir / "mods" / "assets";
+    fs::path exportModsPath = cosmicReachDir / "export_mods" / modId;
 
     fs::create_directories(exportModsPath);
     // export_mods/blocks/<modId>
-    fs::create_directories(exportModsPath + "blocks\\" + currentMod->getId());
+    fs::create_directories(exportModsPath / "blocks" / modId);
     // export_mods/models/blocks/<modId>
-    fs::create_directories(exportModsPath + "models\\blocks\\" + currentMod->getId());
+    fs::create_directories(exportModsPath / "models" / "blocks" / modId);
     // export_mods/textures/blocks/<modId>
-    fs::create_directories(exportModsPath + "textures\\blocks\\" + currentMod->getId());
+    fs::create_directories(exportModsPath / "textures" / "blocks" / modId);
 
     std::ofstream file;
     
-    std::string texPath;
+    fs::path texPath, placementDir;
+    std::string cloneCmd;
     for (Block *b : currentMod->getBlocks()) {
         // export_mods/blocks/<modId>/<blockId>.json
-        file.open(exportModsPath + "blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
+        file.open(exportModsPath / "blocks" / (modId + '_' + b->id + ".json"));
         file << b->toString(currentMod);
         file.close();
 
         // export_mods/models/blocks/<modId>/<blockId>.json
-        file.open(exportModsPath + "models\\blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
-        file << b->modelToString(currentMod);
-        file.close();
-
-        // export_mods/models/blocks/<modId>/<blockId>.json
-        file.open(exportModsPath + "models\\blocks\\" + currentMod->getId() + '\\' + b->id + ".json");
+        file.open(exportModsPath / "models" / "blocks" / (modId + '_' + b->id + ".json"));
         file << b->modelToString(currentMod);
         file.close();
 
         for (auto [face, path] : b->faces) {
             // export_mods/textures/<modId>/<texture>.png
-            texPath = exportModsPath + "textures\\blocks\\" + currentMod->getId() + '\\' + getFilenameFromPath(path);
+            texPath = exportModsPath / "textures" / "blocks" / getFilenameFromPath(path);
             if (!fs::exists(texPath))
                 fs::copy_file(path, texPath);
         }
     }
-    // fs::copy(exportModsPath + "blocks", cosmicReachDir + "export_mods\\blocks", fs::copy_options::update_existing);
+    // * Clone all mod data
+    try {
+        // * Blocks
+        placementDir = modsPath / "blocks";
+        fs::create_directories(placementDir);
+        // copy export_mods/<modId>/blocks/<modId> mods/blocks/<modId>
+        cloneCmd = std::string("copy ") + (exportModsPath / "blocks" / "").string() + ' ' + (placementDir / "").string();
+        system(cloneCmd.c_str());
+
+        // * Models
+        placementDir = modsPath / "models" / "blocks";
+        fs::create_directories(placementDir);
+        // copy export_mods/<modId>/models/blocks/<modId> mods/models/blocks/<modId>
+        cloneCmd = std::string("copy ") + (exportModsPath / "models" / "blocks" / "").string() + ' ' + (placementDir / "").string();
+        system(cloneCmd.c_str());
+
+        // * Textures
+        placementDir = modsPath / "textures" / "blocks";
+        fs::create_directories(placementDir);
+        // copy export_mods/<modId>/textures/blocks/<modId> mods/textures/blocks/<modId>
+        cloneCmd = std::string("copy ") + (exportModsPath / "textures" / "blocks" / "").string() + ' ' + (placementDir / "").string();
+        system(cloneCmd.c_str());
+    } catch (std::exception &ex) {
+        std::cout << ex.what() << std::endl;
+    }
 }

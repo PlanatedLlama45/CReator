@@ -29,7 +29,7 @@ extern Map<std::string, Scene *> scenes;
 extern Mod *currentMod;
 extern Block *currentBlock;
 extern std::vector<Mod *> mods;
-extern std::string cosmicReachDir;
+extern fs::path cosmicReachDir;
 extern TextureFace currentFace;
 // extern std::string openFolderCommand;
 
