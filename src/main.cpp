@@ -7,7 +7,7 @@ Block *currentBlock = nullptr;
 std::vector<Mod *> mods = { };
 TextureFace currentFace = TextureFace::all;
 // fs::path cosmicReachDir = fs::path(getenv("LOCALAPPDATA")) / "cosmic-reach";
-fs::path exportModsDir = fs::current_path() / ".." / "export_mods";
+fs::path exportModsDir = fs::current_path() / "CReator_export_mods";
 std::string openFolderCommand = "explorer " + fs::current_path().string() + "\\..\\export_mods\\";
 
 ButtonColorScheme colorScheme_button {
@@ -327,7 +327,9 @@ Scene *setScene(strRef name) {
 }
 
 void loadMods() {
-    std::ifstream file("../mods");
+    if (!fs::exists("./mods"))
+        return;
+    std::ifstream file("./mods");
 
     std::string line;
     std::string id, name;
@@ -394,7 +396,7 @@ void loadMods() {
 }
 
 void dumpMods() {
-    std::ofstream file("../mods");
+    std::ofstream file("./mods");
 
     std::vector<Block *> blocks;
     for (Mod *mod : mods) {

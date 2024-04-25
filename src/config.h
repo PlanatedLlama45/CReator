@@ -12,7 +12,7 @@
 namespace fs = std::filesystem;
 #include <fstream>
 
-#include <stb_image.h>
+// #include <stb_image.h>
 
 #define getter(variable, type, capitalized) inline type get##capitalized() const { return variable; }
 #define getter_ref(variable, type, capitalized) inline const type &get##capitalized() const { return variable; }
