@@ -7,8 +7,8 @@ Block *currentBlock = nullptr;
 std::vector<Mod *> mods = { };
 TextureFace currentFace = TextureFace::all;
 // fs::path cosmicReachDir = fs::path(getenv("LOCALAPPDATA")) / "cosmic-reach";
-fs::path exportModsDir = fs::current_path() / "CReator_export_mods";
-std::string openFolderCommand = "explorer " + fs::current_path().string() + "\\..\\export_mods\\";
+fs::path exportModsDir = fs::current_path() / "export_mods";
+std::string openFolderCommand = "explorer " + fs::current_path().string() + "\\export_mods\\";
 
 ButtonColorScheme colorScheme_button {
     { WHITE, LIGHTGRAY },
@@ -204,6 +204,8 @@ int main(int argc, const char **argv) {
         else if (isScene("export-done")) {
             if (isButtonPressed("ok-btn")) {
                 setScene("mod-edit");
+            } else if (isButtonPressed("open-folder")) {
+                system(openFolderCommand.c_str());
             }
         }
 
@@ -297,7 +299,8 @@ void createUI() {
     
     addScene("export-done")
         .addStaticText("text", { 300, 200 }, true, "   The mod has been\n\nexported successfully", 30, BLACK)
-        .addTextButton("ok-btn", { 300, 260 }, { 180, 50 }, true, "Ok", 30, true, colorScheme_textEdit, 2);
+        .addTextButton("open-folder", { 300, 260 }, { 280, 50 }, true, "Open in explorer", 30, true, colorScheme_textEdit, 2)
+        .addTextButton("ok-btn", { 300, 320 }, { 180, 50 }, true, "Ok", 30, true, colorScheme_textEdit, 2);
     
     addScene("mod-delete-confirm")
         .addStaticText("question", { 300, 200 }, true, "Are you sure you want to delete this mod?", 24, BLACK)
