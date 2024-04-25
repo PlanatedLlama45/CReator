@@ -88,6 +88,8 @@ struct TextEditColorScheme {
 
 #define isKeyPressedRepeat(key) ( IsKeyPressed(key) || IsKeyPressedRepeat(key) )
 
+extern Font globalFont;
+
 class TextEdit : public Button {
 public:
     TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline = 2, strRef initText = "", bool limitText = true);

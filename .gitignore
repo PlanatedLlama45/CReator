@@ -3,3 +3,4 @@ LICENSE
 build/*
 !build/*.exe
 .vscode/*
+*.zip

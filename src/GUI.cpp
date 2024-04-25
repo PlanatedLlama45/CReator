@@ -60,6 +60,8 @@ bool Button::isPressed() const {
  * Text Edit
 */
 
+// Font globalFont = LoadFontEx();
+
 TextEdit::TextEdit(Vector2 pos, Vector2 size, bool centered, int fontSize, bool centerText, TextEditColorScheme colorScheme, int outline, strRef initText, bool limitText) :
         Button(pos, size, centered, { colorScheme.normal, colorScheme.hovered, colorScheme.focused }, outline) {
     this->fontSize = fontSize;
@@ -110,7 +112,7 @@ void TextEdit::update() {
             cursorPos = text.length();
         else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_V)) {
             size_t oldSize = text.length();
-            text += GetClipboardText();
+            text.insert(cursorPos, GetClipboardText());
             cursorPos += text.length() - oldSize;
             recalculateTextPos();
         }
@@ -156,7 +158,7 @@ bool TextEdit::isFocused() {
     return focused;
 }
 
-void TextEdit::setText(const std::string& str) {
+void TextEdit::setText(strRef str) {
     text = str;
     cursorPos = text.length();
     while (recalculateTextPos());

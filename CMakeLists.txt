@@ -49,6 +49,8 @@ target_link_libraries(
     -static
 )
 
+target_compile_options(CReate PUBLIC -O3)
+
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")
     # Tell Emscripten to build an example.html file.
